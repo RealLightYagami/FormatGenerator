@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Formatter Tool</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    h1 {
+      font-size: 28px;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    
+    .description {
+      color: #7f8c8d;
+      font-size: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background: #f9f9f9;
+      border-radius: 6px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid #eee;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+    }
+    
+    .card-title i {
+      margin-right: 10px;
+      color: #3498db;
+    }
+    
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    
+    select:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 25px;
+      background: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      font-weight: bold;
+      transition: background 0.3s;
+      width: 100%;
+      margin: 5px 0;
+    }
+    
+    .btn:hover {
+      background: #2980b9;
+    }
+    
+    .btn.copy {
+      background: #2ecc71;
+    }
+    
+    .btn.copy:hover {
+      background: #27ae60;
+    }
+    
+    .result-box {
+      background: #e8f4ff;
+      border-radius: 4px;
+      padding: 20px;
+      margin: 20px 0;
+      min-height: 150px;
+      white-space: pre-wrap;
+      border: 1px dashed #a0c8ff;
+      font-family: Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    
+    .other-input {
+      margin-top: 5px;
+      display: none;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .room-parent {
+      background: #edf7ff;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      border: 1px dashed #c2e0ff;
+    }
+    
+    .room-parent h4 {
+      margin-bottom: 10px;
+      color: #3498db;
+      font-size: 15px;
+    }
+    
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -5px;
+    }
+    
+    .col {
+      flex: 1;
+      padding: 0 5px;
+      min-width: 120px;
+    }
+    
+    .skip-btn {
+      background: #e74c3c;
+      font-size: 13px;
+      padding: 6px 10px;
+      margin-top: 5px;
+    }
+    
+    .skip-btn:hover {
+      background: #c0392b;
+    }
+    
+    .hobby-container {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .hobby-container > div {
+      flex: 1;
+    }
+    
+    .highlight {
+      background: #fffacd;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .row {
+        flex-direction: column;
+      }
+      
+      .col {
+        margin-bottom: 10px;
+      }
+      
+      .hobby-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Text Formatter Tool</h1>
+      <p class="description">Select a format, fill in the details, and generate your text</p>
+    </header>
+    
+    <div class="card">
+      <div class="card-title">
+        <i>📋</i> Select Format Type
+      </div>
+      <select id="formatType" onchange="renderForm()">
+        <option value="">-- Please select a format --</option>
+        <option value="1">Short Introduction</option>
+        <option value="2">Long Introduction</option>
+        <option value="3">Ask Name of Senior Sir</option>
+        <option value="4">Ask Name of Senior Ma'am</option>
+        <option value="5">Tell Name of Senior</option>
+      </select>
+    </div>
+    
+    <form id="dynamicForm" onsubmit="generateText(); return false;"></form>
+    
+    <div id="resultContainer" style="display: none;">
+      <div class="card">
+        <div class="card-title">
+          <i>📝</i> Generated Text
+        </div>
+        <div class="result-box" id="resultBox"></div>
+        <button class="btn copy" onclick="copyText()">Copy Text</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const times = ['Morning', 'Afternoon', 'Evening'];
+    const seniorTitles = ['Seniors', 'Senior Sir', 'Senior Ma\'am'];
+    const boards = ['ICSE', 'CBSE', 'Other'];
+    const categories = ['General', 'OBC', 'SC', 'ST', 'KM', 'PWD', 'NRI', 'Other'];
+    const branches = [
+      'Civil Engineering', 'Electrical Engineering', 'Mechanical Engineering',
+      'Electronics and Communication Engineering', 'Electronics and Communication Engineering IoT',
+      'Computer Science and Engineering', 'Chemical Engineering', 'Information Technology'
+    ];
+    const years = ['First', 'Second', 'Third', 'Fourth'];
+    const hobbies = [
+      'Shayari / Poetry Recitation', 'Tongue Twister Challenge', 'Speed Rubik\'s Cube',
+      'Origami (Paper folding)', 'Quick Sketching /Doodling', 'Beatboxing (basic)',
+      'Mini Storytelling (Funny or Motivational)', 'Quick Magic Trick (coin trick or rubber band)',
+      'Other'
+    ];
+
+    function renderForm() {
+      const formatType = document.getElementById('formatType').value;
+      const form = document.getElementById('dynamicForm');
+      form.innerHTML = '';
+      document.getElementById('resultContainer').style.display = 'none';
+      
+      if (!formatType) return;
+      
+      let formHTML = '<div class="card"><div class="card-title"><i>✏️</i> Fill Details</div>';
+      
+      if (formatType === '1') {
+        // Short Introduction
+        formHTML += `
+          <div class="form-group">
+            <label>Good <span class="highlight">(select time)</span></label>
+            <select id="time">
+              ${times.map(t => `<option value="${t}">${t}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Respected <span class="highlight">(select title)</span></label>
+            <select id="title">
+              ${seniorTitles.map(t => `<option value="${t}">${t}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>My name is <span class="highlight">(your name)</span></label>
+            <input type="text" id="name" placeholder="Enter your name">
+          </div>
+          
+          <div class="form-group">
+            <label>Branch <span class="highlight">(select branch)</span></label>
+            <select id="branch">
+              ${branches.map(b => `<option value="${b}">${b}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Year <span class="highlight">(select year)</span></label>
+            <select id="year">
+              ${years.map(y => `<option value="${y}">${y}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>I am from <span class="highlight">(your place)</span></label>
+            <input type="text" id="place" placeholder="Enter your place">
+          </div>
+          
+          <div class="form-group">
+            <label>My hobbies are</label>
+            <div class="hobby-container">
+              <div>
+                <select id="hobby1" onchange="toggleHobbyOther('hobby1')">
+                  ${hobbies.map(h => `<option value="${h}">${h}</option>`).join('')}
+                </select>
+                <input type="text" id="hobby1_other" class="other-input" placeholder="Specify your hobby">
+              </div>
+              <div>
+                <select id="hobby2" onchange="toggleHobbyOther('hobby2')">
+                  ${hobbies.map(h => `<option value="${h}">${h}</option>`).join('')}
+                </select>
+                <input type="text" id="hobby2_other" class="other-input" placeholder="Specify your hobby">
+              </div>
+            </div>
+          </div>
+        `;
+      } 
+      else if (formatType === '2') {
+        // Long Introduction
+        formHTML += `
+          <div class="form-group">
+            <label>Good <span class="highlight">(select time)</span></label>
+            <select id="time">
+              ${times.map(t => `<option value="${t}">${t}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Respected <span class="highlight">(select title)</span></label>
+            <select id="title">
+              ${seniorTitles.map(t => `<option value="${t}">${t}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>My name is <span class="highlight">(your name)</span></label>
+            <input type="text" id="name" placeholder="Enter your name">
+          </div>
+          
+          <div class="form-group">
+            <label>My father's name is Mr. <span class="highlight">(father's name)</span></label>
+            <input type="text" id="father" placeholder="Enter father's name">
+          </div>
+          
+          <div class="form-group">
+            <label>I am from <span class="highlight">(your place)</span></label>
+            <input type="text" id="place" placeholder="Enter your place">
+          </div>
+          
+          <div class="form-group">
+            <label>High school name</label>
+            <input type="text" id="school" placeholder="Enter school name">
+          </div>
+          
+          <div class="form-group">
+            <label>Affiliated to <span class="highlight">(board)</span></label>
+            <select id="schoolBoard" onchange="toggleOther('schoolBoard')">
+              <option value="">-- Select Board --</option>
+              ${boards.map(b => `<option value="${b}">${b}</option>`).join('')}
+              <option value="__other__">Other</option>
+            </select>
+            <input type="text" id="schoolBoard_other" class="other-input" placeholder="Specify board">
+          </div>
+          
+          <div class="row">
+            <div class="col">
+              <label>Average percentage (%)</label>
+              <input type="text" id="schoolPct" placeholder="Enter percentage">
+            </div>
+            <div class="col">
+              <label>Year of passing</label>
+              <input type="text" id="schoolYear" placeholder="Enter year">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Intermediate school name</label>
+            <input type="text" id="inter" placeholder="Enter school name">
+          </div>
+          
+          <div class="form-group">
+            <label>Affiliated to <span class="highlight">(board)</span></label>
+            <select id="interBoard" onchange="toggleOther('interBoard')">
+              <option value="">-- Select Board --</option>
+              ${boards.map(b => `<option value="${b}">${b}</option>`).join('')}
+              <option value="__other__">Other</option>
+            </select>
+            <input type="text" id="interBoard_other" class="other-input" placeholder="Specify board">
+          </div>
+          
+          <div class="row">
+            <div class="col">
+              <label>Average percentage (%)</label>
+              <input type="text" id="interPct" placeholder="Enter percentage">
+            </div>
+            <div class="col">
+              <label>Year of passing</label>
+              <input type="text" id="interYear" placeholder="Enter year">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>JEE Main General Rank</label>
+            <input type="text" id="jeeRank" placeholder="Enter your rank">
+          </div>
+          
+          <div class="form-group">
+            <label>Counselling category</label>
+            <select id="category" onchange="toggleOther('category')">
+              <option value="">-- Select Category --</option>
+              ${categories.map(c => `<option value="${c}">${c}</option>`).join('')}
+              <option value="__other__">Other</option>
+            </select>
+            <input type="text" id="category_other" class="other-input" placeholder="Specify category">
+          </div>
+          
+          <div class="form-group">
+            <label>Counselled branch</label>
+            <select id="branch">
+              ${branches.map(b => `<option value="${b}">${b}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div class="row">
+            <div class="col">
+              <label>Allotted room no.</label>
+              <input type="text" id="roomNo" placeholder="Enter room number">
+            </div>
+            <div class="col">
+              <label>Bhavan</label>
+              <input type="text" id="bhavan" placeholder="Enter bhavan name">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>My room <span class="highlight">(select)</span> are</label>
+            <select id="roomRole">
+              <option value="fathers">Fathers</option>
+              <option value="Mothers">Mothers</option>
+            </select>
+          </div>
+          
+          <h3 style="margin: 20px 0 10px; color: #2c3e50;">Room Father/Mother Details</h3>
+          <p style="margin-bottom: 15px; color: #7f8c8d; font-size: 14px;">Fill details or use skip button</p>
+          
+          ${[1, 2, 3, 4].map(i => `
+            <div class="room-parent">
+              <h4>Room Father/Mother ${i}</h4>
+              <div class="row">
+                <div class="col">
+                  <input type="text" id="rfm${i}Name" placeholder="Name">
+                </div>
+                <div class="col">
+                  <select id="rfm${i}Title">
+                    <option value="">Title</option>
+                    <option value="Sir">Sir</option>
+                    <option value="Ma'am">Ma'am</option>
+                  </select>
+                </div>
+                <div class="col">
+                  <select id="rfm${i}Branch">
+                    <option value="">Branch</option>
+                    ${branches.map(b => `<option value="${b}">${b}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="col">
+                  <select id="rfm${i}Year">
+                    <option value="">Year</option>
+                    ${years.map(y => `<option value="${y}">${y}</option>`).join('')}
+                  </select>
+                </div>
+              </div>
+              <button type="button" class="btn skip-btn" onclick="skipRoomParent(${i})">Skip</button>
+            </div>
+          `).join('')}
+          
+          <div class="form-group">
+            <label>My hobbies are</label>
+            <div class="hobby-container">
+              <div>
+                <select id="hobby1" onchange="toggleHobbyOther('hobby1')">
+                  ${hobbies.map(h => `<option value="${h}">${h}</option>`).join('')}
+                </select>
+                <input type="text" id="hobby1_other" class="other-input" placeholder="Specify your hobby">
+              </div>
+              <div>
+                <select id="hobby2" onchange="toggleHobbyOther('hobby2')">
+                  ${hobbies.map(h => `<option value="${h}">${h}</option>`).join('')}
+                </select>
+                <input type="text" id="hobby2_other" class="other-input" placeholder="Specify your hobby">
+              </div>
+            </div>
+          </div>
+        `;
+      } 
+      else if (formatType === '3') {
+        // Ask name of senior sir
+        formHTML += `
+          <div class="form-group">
+            <label>Good <span class="highlight">(select time)</span></label>
+            <select id="time">
+              ${times.map(t => `<option value="${t}">${t}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Respected <span class="highlight">(select title)</span></label>
+            <select id="title">
+              <option value="Senior Sir">Senior Sir</option>
+              <option value="Seniors">Seniors</option>
+            </select>
+          </div>
+        `;
+      } 
+      else if (formatType === '4') {
+        // Ask name of senior ma'am
+        formHTML += `
+          <div class="form-group">
+            <label>Good <span class="highlight">(select time)</span></label>
+            <select id="time">
+              ${times.map(t => `<option value="${t}">${t}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Respected <span class="highlight">(select title)</span></label>
+            <select id="title">
+              <option value="Senior Ma'am">Senior Ma'am</option>
+              <option value="Seniors">Seniors</option>
+            </select>
+          </div>
+        `;
+      } 
+      else if (formatType === '5') {
+        // Tell name of senior
+        formHTML += `
+          <div class="form-group">
+            <label>Respected senior <span class="highlight">(name)</span></label>
+            <input type="text" id="seniorName" placeholder="Enter senior's name">
+          </div>
+          
+          <div class="form-group">
+            <label>Title <span class="highlight">(select title)</span></label>
+            <select id="title">
+              <option value="Sir">Sir</option>
+              <option value="Ma'am">Ma'am</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Branch <span class="highlight">(select branch)</span></label>
+            <select id="branch">
+              ${branches.map(b => `<option value="${b}">${b}</option>`).join('')}
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Year <span class="highlight">(select year)</span></label>
+            <select id="year">
+              ${years.map(y => `<option value="${y}">${y}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      }
+      
+      formHTML += `
+        <button type="submit" class="btn">Generate Text</button>
+        </div>
+      `;
+      
+      form.innerHTML = formHTML;
+    }
+    
+    function toggleOther(id) {
+      const select = document.getElementById(id);
+      const otherInput = document.getElementById(id + '_other');
+      otherInput.style.display = select.value === '__other__' ? 'block' : 'none';
+    }
+    
+    function toggleHobbyOther(id) {
+      const select = document.getElementById(id);
+      const otherInput = document.getElementById(id + '_other');
+      otherInput.style.display = select.value === 'Other' ? 'block' : 'none';
+    }
+    
+    function skipRoomParent(index) {
+      document.getElementById(`rfm${index}Name`).value = '';
+      document.getElementById(`rfm${index}Title`).value = '';
+      document.getElementById(`rfm${index}Branch`).value = '';
+      document.getElementById(`rfm${index}Year`).value = '';
+    }
+    
+    function getValue(id) {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
+    }
+    
+    function getHobbyValue(id) {
+      const select = document.getElementById(id);
+      if (!select) return '';
+      
+      if (select.value === 'Other') {
+        const other = document.getElementById(id + '_other').value.trim();
+        return other || 'Other';
+      }
+      return select.value;
+    }
+    
+    function generateText() {
+      const formatType = document.getElementById('formatType').value;
+      let text = '';
+      
+      if (formatType === '1') {
+        // Short Introduction
+        text = `Good ${getValue('time')} respected ${getValue('title')}.\n\n`;
+        text += `My name is ${getValue('name')}, ${getValue('branch')} Branch B.Tech ${getValue('year')} Year.\n`;
+        text += `I am from ${getValue('place')}.\n\n`;
+        text += `My hobbies are ${getHobbyValue('hobby1')} & ${getHobbyValue('hobby2')}.`;
+      } 
+      else if (formatType === '2') {
+        // Long Introduction
+        text = `Good ${getValue('time')} Respected ${getValue('title')}.\n\n`;
+        text += `My name is ${getValue('name')}\n`;
+        text += `My father's name is Mr. ${getValue('father')}\n`;
+        text += `I am from ${getValue('place')}\n\n`;
+        
+        // School details
+        let schoolBoard = getValue('schoolBoard') === '__other__' ? 
+                          getValue('schoolBoard_other') : getValue('schoolBoard');
+        text += `I have completed my high school from ${getValue('school')} `;
+        text += `which is affiliated to ${schoolBoard} with an average percentage of `;
+        text += `${getValue('schoolPct')}% in the year ${getValue('schoolYear')}.\n\n`;
+        
+        // Intermediate details
+        let interBoard = getValue('interBoard') === '__other__' ? 
+                         getValue('interBoard_other') : getValue('interBoard');
+        text += `I have completed my intermediate from ${getValue('inter')} `;
+        text += `which is affiliated to ${interBoard} with an average percentage of `;
+        text += `${getValue('interPct')}% in the year ${getValue('interYear')}.\n\n`;
+        
+        // JEE and branch details
+        let category = getValue('category') === '__other__' ? 
+                       getValue('category_other') : getValue('category');
+        text += `I had given JEE Main in which my General Rank was ${getValue('jeeRank')} `;
+        text += `and through ${category} counselling I got ${getValue('branch')} branch.\n\n`;
+        
+        // Room details
+        text += `I have been allotted room no. ${getValue('roomNo')} in ${getValue('bhavan')} bhavan.\n\n`;
+        
+        // Room parents
+        const roomRole = getValue('roomRole');
+        const parents = [];
+        
+        for (let i = 1; i <= 4; i++) {
+          const name = getValue(`rfm${i}Name`);
+          const title = getValue(`rfm${i}Title`);
+          const branch = getValue(`rfm${i}Branch`);
+          const year = getValue(`rfm${i}Year`);
+          
+          if (name || title || branch || year) {
+            parents.push(`respected senior ${name} ${title} ${branch} ${year} Year`);
+          }
+        }
+        
+        if (parents.length > 0) {
+          text += `My room ${roomRole} are ${parents.join(' and ')}.\n\n`;
+        }
+        
+        // Hobbies
+        text += `My hobbies are ${getHobbyValue('hobby1')} & ${getHobbyValue('hobby2')}.`;
+      } 
+      else if (formatType === '3') {
+        // Ask name of senior sir
+        text = `Good ${getValue('time')} Respected ${getValue('title')}.\n\n`;
+        text += `May I have pleasure to know your good name and divine branch please sir??`;
+      } 
+      else if (formatType === '4') {
+        // Ask name of senior ma'am
+        text = `Good ${getValue('time')} Respected ${getValue('title')}.\n\n`;
+        text += `May I have single pleasure, Double honour, Triple delight to know your good name and divine branch, please please please ma'am.`;
+      } 
+      else if (formatType === '5') {
+        // Tell name of senior
+        text = `Respected senior ${getValue('seniorName')} ${getValue('title')} `;
+        text += `${getValue('branch')} ${getValue('year')} Year.`;
+      }
+      
+      document.getElementById('resultBox').textContent = text;
+      document.getElementById('resultContainer').style.display = 'block';
+      
+      // Scroll to result
+      document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function copyText() {
+      const text = document.getElementById('resultBox').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const copyBtn = document.querySelector('.btn.copy');
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = '✓ Copied!';
+        
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
